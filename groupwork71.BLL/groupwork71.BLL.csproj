@@ -10,8 +10,4 @@
       <ProjectReference Include="..\groupwork71.DAL\groupwork71.DAL.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
-
 </Project>

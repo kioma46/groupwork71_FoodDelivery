@@ -1,0 +1,84 @@
+﻿@model groupwork71.ViewModels.RegisterViewModel
+
+@{
+    ViewBag.Title = "Sign Up";
+}
+
+<form class="w-50 mx-auto px-1 py-3 border rounded-3 bg-light" method="post" asp-controller="Account" asp-action="Register">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="UserName">Login</label><br />
+        <input class="form-control w-100" required asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="Email"></label><br />
+        <input class="form-control w-100" required asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="ProfilePictureUrl"></label><br />
+        <input class="form-control w-100" required asp-for="ProfilePictureUrl" />
+        <span asp-validation-for="ProfilePictureUrl"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="Password"></label><br />
+        <input id="passwordLine" class="form-control w-100" required asp-for="Password" />
+        <button class="border-0 bg-transparent" id="eye-button" type="button">
+            <i class="bi bi-eye-slash fs-6"></i>
+        </button>
+        <br>
+        <span asp-validation-for="Password"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="PasswordConfirm"></label><br />
+        <input id="confirmPasswordLine" class="form-control w-100" required asp-for="PasswordConfirm" />
+        <button class="border-0 bg-transparent" id="eye-button-on-confirm" type="button">
+            <i class="bi bi-eye-slash fs-6"></i>
+        </button>
+        <br>
+        <span asp-validation-for="PasswordConfirm"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="DateOfBirth"></label> <br/>
+        <input type="date" class="form-control w-50 mx-auto" required asp-for="DateOfBirth" />
+        <span asp-validation-for="DateOfBirth"></span>
+    </div>
+    <div class="mb-2 w-75 mx-auto form-group">
+        <input class="btn btn-primary w-100" type="submit" value="Sign Up" />
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    $('#eye-button').on('click', function (e){
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $btn.find('i'); 
+        const $pLine = $('#passwordLine');
+        
+        if ($icon.hasClass('bi-eye-slash')) {
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            $pLine.attr('type', 'text');
+        } else {
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+            $pLine.attr('type', 'password');
+        }
+    });
+    $('#eye-button-on-confirm').on('click', function (e){
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $btn.find('i');
+        const $pLine = $('#confirmPasswordLine');
+
+        if ($icon.hasClass('bi-eye-slash')) {
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            $pLine.attr('type', 'text');
+        } else {
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+            $pLine.attr('type', 'password');
+        }
+    });
+</script>
+}

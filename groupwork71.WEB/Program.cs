@@ -1,13 +1,29 @@
+using GroupHomework66.Models;
+using groupwork71.BLL.Services;
+using groupwork71.DAL.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 namespace groupwork71;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
+        builder.Services.AddDbContext<DeliveryMobileContext>(options => options.UseNpgsql(connection))
+            .AddIdentity<User, IdentityRole<int>>()
+            .AddEntityFrameworkStores<DeliveryMobileContext>();
+        
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+        });
 
         var app = builder.Build();
 
@@ -22,6 +38,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapStaticAssets();
@@ -29,6 +46,20 @@ public class Program
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
             .WithStaticAssets();
+
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        try
+        {
+            var userManager = services.GetRequiredService<UserManager<User>>();
+            var rolesManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+            await AdminInitializer.SeedAdminAndRoleData(rolesManager, userManager);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while seeding the database.");
+        }
 
         app.Run();
     }

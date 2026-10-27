@@ -1,0 +1,62 @@
+﻿@model groupwork71.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<form class="w-50 mx-auto px-1 py-3 border rounded-3 bg-light" method="post" asp-controller="Account" asp-action="Login">
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" value="@Model.ReturnUrl" asp-for="ReturnUrl">
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="LoginOrEmail">Enter login or Email</label><br />
+        <input class="form-control w-100" asp-for="LoginOrEmail" />
+        <span asp-validation-for="LoginOrEmail"></span>
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="Password"></label><br />
+        <input id="passwordLine" class="form-control w-100" asp-for="Password" />
+        <button class="border-0 bg-transparent" id="eye-button" type="button">
+            <i class="bi bi-eye-slash fs-6"></i>
+        </button>
+        <br>
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="RememberMe"></label><br />
+        <input asp-for="RememberMe" />
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <input class="btn btn-primary w-100" type="submit" value="Login" />
+    </div>
+
+</form>
+
+<div class="my-3 w-25 text-center mx-auto">
+    <span>Don't have an account yet?</span>
+    <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Sign Up</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    $('#eye-button').on('click', function (e){
+        e.preventDefault();
+        const $btn = $(this);
+        const $icon = $btn.find('i'); 
+        const $pLine = $('#passwordLine');
+        
+        if ($icon.hasClass('bi-eye-slash')) {
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            $pLine.attr('type', 'text');
+        } else {
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+            $pLine.attr('type', 'password');
+        }
+    });
+</script>
+    
+}

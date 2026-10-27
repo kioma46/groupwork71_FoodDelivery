@@ -1,4 +1,4 @@
-namespace groupwork71.Models;
+namespace groupwork71.ViewModels;
 
 public class ErrorViewModel
 {

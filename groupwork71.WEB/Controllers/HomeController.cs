@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using groupwork71.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using groupwork71.Models;
 
 namespace groupwork71.Controllers;
 
