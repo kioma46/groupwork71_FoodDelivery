@@ -1,6 +1,9 @@
+using groupwork71.BLL.Interfaces;
 using groupwork71.BLL.Services;
 using groupwork71.DAL.Data;
+using groupwork71.DAL.Interfaces;
 using groupwork71.DAL.Models;
+using groupwork71.DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +28,10 @@ public class Program
             options.AccessDeniedPath = "/Account/AccessDenied";
         });
 
+        builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+        builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        builder.Services.AddScoped<IDishService, DishService>();
+        builder.Services.AddScoped<IDishRepository, DishRepository>();
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -44,7 +51,7 @@ public class Program
         app.MapStaticAssets();
         app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Restaurant}/{action=RestaurantList}/{id?}")
             .WithStaticAssets();
 
         using var scope = app.Services.CreateScope();

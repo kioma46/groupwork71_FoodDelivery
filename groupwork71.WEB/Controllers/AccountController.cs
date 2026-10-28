@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LW63.Controllers;
+namespace groupwork71.Controllers;
 
 public class AccountController : Controller
 {
@@ -21,12 +21,28 @@ public class AccountController : Controller
     private bool IsAdmin => User.IsInRole("Admin");
     // GET
     
-    [Authorize(Roles = "Admin")]
-    public IActionResult Index()
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> Index()
     {
-        List<User> users = _userManager.Users.ToList();
-        return View(users);
+        var users = _userManager.Users.ToList();
+        var model = new List<UserManagementViewModel>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            model.Add(new UserManagementViewModel
+            {
+                User = user,
+                Roles = roles,
+                SelectedRole = roles.FirstOrDefault() ?? "User",
+                IsCurrentUser = user.Id == CurrentUserId
+            });
+        }
+
+        return View(model);
     }
+
     
     [HttpGet]
     public IActionResult Register()
@@ -197,6 +213,151 @@ public class AccountController : Controller
         
         return View(uevm);
     }
-
     
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> ChangeRole(int userId, string role)
+    {
+        if (role != "Admin" && role != "User")
+        {
+            TempData["Error"] = "Недопустимая роль.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            return NotFound();
+
+        if (user.Id == CurrentUserId)
+        {
+            TempData["Error"] = "Нельзя изменять собственную роль.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        if (currentRoles.Contains("Manager"))
+        {
+            TempData["Error"] = "Нельзя изменять роль главного управляющего.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+        if (!removeResult.Succeeded)
+        {
+            TempData["Error"] = "Не удалось удалить старые роли.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var addResult = await _userManager.AddToRoleAsync(user, role);
+
+        if (!addResult.Succeeded)
+        {
+            TempData["Error"] = "Не удалось назначить новую роль.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["Success"] = $"Пользователю {user.UserName} назначена роль {role}.";
+
+        return RedirectToAction(nameof(Index));
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Manager")]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            return NotFound();
+
+        if (user.Id == CurrentUserId)
+        {
+            TempData["Error"] = "Нельзя удалить собственный аккаунт.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles.Contains("Manager"))
+        {
+            TempData["Error"] = "Нельзя удалить главного управляющего.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["Success"] = $"Пользователь {user.UserName} удалён.";
+
+        return RedirectToAction(nameof(Index));
+    }
+    
+    
+    [HttpGet]
+    [Authorize(Roles = "Manager")]
+    public IActionResult CreateUser()
+    {
+        return View(new CreateUserViewModel());
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Manager")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateUser(CreateUserViewModel model)
+    {
+        if (model.Role != "User" && model.Role != "Admin")
+        {
+            ModelState.AddModelError(nameof(model.Role), "Недопустимая роль.");
+        }
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = new User
+        {
+            UserName = model.UserName,
+            Email = model.Email
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+
+        if (!roleResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+
+            foreach (var error in roleResult.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
+        TempData["Success"] = $"Пользователь {user.UserName} успешно создан.";
+
+        return RedirectToAction(nameof(Index));
+    }
 }

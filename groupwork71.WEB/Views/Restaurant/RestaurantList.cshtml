@@ -1,0 +1,47 @@
+﻿@model List<groupwork71.DAL.Models.Restaurant>
+
+@{
+    ViewData["Title"] = "Рестораны";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Рестораны</h2>
+    </div>
+    <div class="border rounded overflow-hidden">
+        @if (!Model.Any())
+        {
+            <p>Еще нет ресторанов</p>
+        }
+        else
+        {
+            @foreach (var restaurant in Model)
+            {
+                <div class="d-flex align-items-center p-3 border-bottom gap-3">
+                    <a asp-action="RestaurantDetails" asp-route-id="@restaurant.Id" class="text-decoration-none text-dark flex-grow-1">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="w-25">
+                                <span class="text-primary">@restaurant.Name</span>
+                            </div>
+                            <div class="w-25">
+                                <img src="@restaurant.Image" alt="@restaurant.Name" style="max-width: 120px; max-height: 80px;" />
+                            </div>
+                            <div class="flex-grow-1">
+                                @restaurant.Description
+                            </div>
+                        </div>
+                    </a>
+                    @if (User.IsInRole("Manager"))
+                    {
+                        <a asp-action="EditRestaurant" asp-route-id="@restaurant.Id" class="btn btn-warning btn-sm">Изменить</a>
+                        <form asp-action="DeleteRestaurant" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@restaurant.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить ресторан?');">Удалить</button>
+                        </form>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

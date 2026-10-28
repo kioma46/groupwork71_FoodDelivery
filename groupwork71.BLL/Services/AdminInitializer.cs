@@ -28,7 +28,7 @@ public class AdminInitializer
             };
             IdentityResult result = await _userManager.CreateAsync(admin, AdminPassword);
             if (result.Succeeded)
-                await _userManager.AddToRoleAsync(admin, "Admin");
+                await _userManager.AddToRoleAsync(admin, "Manager");
         }
     }
 }
