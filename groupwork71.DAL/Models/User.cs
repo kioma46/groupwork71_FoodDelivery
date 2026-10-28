@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace GroupHomework66.Models;
+namespace groupwork71.DAL.Models;
 
 public class User : IdentityUser<int>
 {

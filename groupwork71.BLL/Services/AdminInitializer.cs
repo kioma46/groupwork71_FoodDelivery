@@ -1,4 +1,4 @@
-﻿using GroupHomework66.Models;
+﻿using groupwork71.DAL.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace groupwork71.BLL.Services;

@@ -1,5 +1,5 @@
-﻿using GroupHomework66.Models;
-using groupwork71.DAL.Data;
+﻿using groupwork71.DAL.Data;
+using groupwork71.DAL.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

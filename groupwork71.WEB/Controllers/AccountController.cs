@@ -1,4 +1,4 @@
-﻿using GroupHomework66.Models;
+﻿using groupwork71.DAL.Models;
 using groupwork71.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
