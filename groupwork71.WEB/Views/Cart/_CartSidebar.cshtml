@@ -1,0 +1,41 @@
+﻿@model groupwork71.BLL.DTOs.CartDto
+
+<div class="card">
+    <div class="card-header fw-bold">Корзина</div>
+    <div class="card-body">
+        @if (!Model.Items.Any())
+        {
+            <p class="text-muted mb-0">Корзина пуста</p>
+        }
+        else
+        {
+            <ul class="list-group list-group-flush mb-3">
+                @foreach (var item in Model.Items)
+                {
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span>@item.DishName</span>
+                            <button type="button" class="btn-close js-cart-remove"
+                                    data-dish-id="@item.DishId" data-restaurant-id="@Model.RestaurantId"
+                                    aria-label="Удалить"></button>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary js-cart-decrease"
+                                        data-dish-id="@item.DishId" data-restaurant-id="@Model.RestaurantId">−</button>
+                                <span class="btn btn-light disabled">@item.Quantity</span>
+                                <button type="button" class="btn btn-outline-secondary js-cart-add"
+                                        data-dish-id="@item.DishId" data-restaurant-id="@Model.RestaurantId">+</button>
+                            </div>
+                            <span>@item.Total.ToString("0.00")</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div class="d-flex justify-content-between fw-bold">
+                <span>Итого:</span>
+                <span>@Model.TotalPrice.ToString("0.00")</span>
+            </div>
+        }
+    </div>
+</div>

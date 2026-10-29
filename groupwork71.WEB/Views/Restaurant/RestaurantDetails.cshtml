@@ -13,44 +13,78 @@
     }
 
     <p>@Model.Description</p>
-
-    <h3 class="mt-4">Меню</h3>
     
-    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-    {
-        <a asp-controller="Dish" asp-action="Create" asp-route-restaurantId="@Model.Id" class="btn btn-primary mb-3">Добавить блюдо</a>
-    }
+    @Html.AntiForgeryToken()
+    
+    <div class="row">
+        <div class="col-lg-9">
+            <h3 class="mt-4">Меню</h3>
 
-    @if (Model.Dishes == null || !Model.Dishes.Any())
-    {
-        <p>В этом ресторане пока нет блюд.</p>
-    }
-    else
-    {
-        <div class="row">
-            @foreach (var dish in Model.Dishes)
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">@dish.Name</h5>
-                            <p class="card-text">@dish.Description</p>
-                            <p class="fw-bold">@dish.Price.ToString("0.00")</p>
-                            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-                            {
-                                <form asp-controller="Dish" asp-action="Delete" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@dish.Id" />
-                                    <input type="hidden" name="restaurantId" value="@Model.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                                </form>
-                            }
+                <a asp-controller="Dish" asp-action="Create" asp-route-restaurantId="@Model.Id" class="btn btn-primary mb-3">Добавить блюдо</a>
+            }
+
+            @if (Model.Dishes == null || !Model.Dishes.Any())
+            {
+                <p>В этом ресторане пока нет блюд.</p>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var dish in Model.Dishes)
+                    {
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@dish.Name</h5>
+                                    <p class="card-text">@dish.Description</p>
+                                    <p class="fw-bold">@dish.Price.ToString("0.00")</p>
+                                    
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <button type="button" class="btn btn-success btn-sm js-cart-add"
+                                                data-dish-id="@dish.Id" data-restaurant-id="@Model.Id">
+                                            В корзину
+                                        </button>
+                                    }
+
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <form asp-controller="Dish" asp-action="Delete" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@dish.Id" />
+                                            <input type="hidden" name="restaurantId" value="@Model.Id" />
+                                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
                         </div>
+                    }
+                </div>
+            }
+        </div>
+        
+        <div class="col-lg-3 mt-4">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div id="cart-sidebar" data-restaurant-id="@Model.Id"></div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <a asp-controller="Account" asp-action="Login">Войдите</a>, чтобы заказать еду.
                     </div>
                 </div>
             }
         </div>
-    }
+    </div>
 
     <a asp-action="RestaurantList" class="btn btn-secondary mt-3">Назад к ресторанам</a>
 </div>
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+}

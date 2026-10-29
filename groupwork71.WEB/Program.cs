@@ -32,6 +32,8 @@ public class Program
         builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         builder.Services.AddScoped<IDishService, DishService>();
         builder.Services.AddScoped<IDishRepository, DishRepository>();
+        builder.Services.AddScoped<ICartService, CartService>();
+        builder.Services.AddScoped<ICartRepository, CartRepository>();
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
