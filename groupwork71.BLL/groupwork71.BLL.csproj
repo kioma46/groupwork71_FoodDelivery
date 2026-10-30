@@ -10,4 +10,8 @@
       <ProjectReference Include="..\groupwork71.DAL\groupwork71.DAL.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MailKit" Version="4.18.2" />
+    </ItemGroup>
+
 </Project>

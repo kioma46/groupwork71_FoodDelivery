@@ -33,6 +33,7 @@ public class Program
         builder.Services.AddScoped<IDishService, DishService>();
         builder.Services.AddScoped<ICartService, CartService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<EmailService>();
         
         builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         builder.Services.AddScoped<IDishRepository, DishRepository>();

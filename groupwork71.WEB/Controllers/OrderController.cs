@@ -1,7 +1,10 @@
 ﻿using System.Security.Claims;
 using groupwork71.BLL.Interfaces;
+using groupwork71.BLL.Services;
+using groupwork71.DAL.Models;
 using groupwork71.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace groupwork71.Controllers;
@@ -9,13 +12,18 @@ namespace groupwork71.Controllers;
 [Authorize]
 public class OrderController : Controller
 {
+    
+    private readonly UserManager<User> _userManager;
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
+    private readonly EmailService _emailService;
 
-    public OrderController(IOrderService orderService, ICartService cartService)
+    public OrderController(IOrderService orderService, ICartService cartService,  EmailService emailService, UserManager<User> userManager)
     {
         _orderService = orderService;
         _cartService = cartService;
+        _emailService = emailService;
+        _userManager = userManager;
     }
 
     private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -47,8 +55,15 @@ public class OrderController : Controller
                 model.DeliveryAddress!,
                 cart
             );
-
-            return RedirectToAction("Success", new { id = order.Id });
+            var cu = await _userManager.FindByIdAsync(CurrentUserId.ToString());
+            if (cu != null && cu.Email != null)
+            {
+                string currentUserEmail = cu.Email;
+                
+                await _emailService.SendEmailAsync(currentUserEmail, "Successful order", CreateEmail(order));
+                return RedirectToAction("Success", new { id = order.Id });
+            }
+            return BadRequest(ModelState);
         }
         catch (Exception ex)
         {
@@ -85,5 +100,25 @@ public class OrderController : Controller
     {
         var order = await _orderService.GetByIdAsync(id);
         return View(order);
+    }
+
+    private string CreateEmail(Order order)
+    {
+        var itemsHtml = new System.Text.StringBuilder();
+        foreach (var oi in order.OrderItems)
+        {
+            itemsHtml.Append($"<li>{oi.Dish?.Name} — {oi.Quantity} шт. по {oi.Price:0.00} (Сумма: {(oi.Price * oi.Quantity):0.00})</li>");
+        }
+
+        string emailText = $"<h4>Вы успешно оформили заказ №{order.Id}!</h4>" +
+                           $"<p><strong>Получатель:</strong> {order.RecipientName}</p>" +
+                           $"<p><strong>Адрес доставки:</strong> {order.DeliveryAddress}</p>" +
+                           $"<p><strong>Номер телефона:</strong> {order.PhoneNumber}</p>" +
+                           $"<p><strong>Дата оформления:</strong> {order.CreatedAt?.ToString("dd.MM.yyyy HH:mm")}</p>" +
+                           $"<p><strong>Состав заказа:</strong></p>" +
+                           $"<ul>{itemsHtml}</ul>" +
+                           $"<p><strong>Итоговая цена:</strong> {order.TotalPrice:0.00}</p>";
+
+        return emailText;
     }
 }
