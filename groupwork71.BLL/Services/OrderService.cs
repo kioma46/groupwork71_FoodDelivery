@@ -68,4 +68,14 @@ public class OrderService : IOrderService
     {
         return await _repository.GetAllAsync();
     }
+
+    public async Task DeleteAsync(Order order)
+    {
+        await _repository.DeleteAsync(order);
+    }
+
+    public async Task DeleteByIdAsync(int id)
+    {
+        await _repository.DeleteByIdAsync(id);
+    }
 }

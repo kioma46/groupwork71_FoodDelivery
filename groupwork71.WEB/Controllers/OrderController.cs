@@ -19,13 +19,7 @@ public class OrderController : Controller
     }
 
     private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-    [HttpGet]
-    public IActionResult Index()
-    {
-        return View();
-    }
-
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateOrderViewModel model)
@@ -65,6 +59,29 @@ public class OrderController : Controller
 
     [HttpGet]
     public async Task<IActionResult> Success(int id)
+    {
+        var order = await _orderService.GetByIdAsync(id);
+        return View(order);
+    }
+
+    [Authorize(Roles = "Admin, Manager")]
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        return View(await _orderService.GetAllAsync());
+    }
+
+    [Authorize(Roles = "Admin, Manager")]
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _orderService.DeleteByIdAsync(id);
+        return RedirectToAction("Index", "Order");
+    }
+
+    [Authorize(Roles = "Admin, Manager")]
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
     {
         var order = await _orderService.GetByIdAsync(id);
         return View(order);

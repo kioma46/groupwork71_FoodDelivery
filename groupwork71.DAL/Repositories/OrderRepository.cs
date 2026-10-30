@@ -30,6 +30,27 @@ public class OrderRepository : IOrderRepository
 
     public async Task<List<Order>> GetAllAsync()
     {
-        return await _context.Orders.OrderBy(o => o.CreatedAt).ToListAsync();
+        return await _context.Orders.Include(o => o.OrderItems)
+            .Include(o => o.Restaurant)
+            .Include(o => o.User).OrderBy(o => o.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task DeleteAsync(Order order)
+    {
+        _context.Orders.Remove(order);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteByIdAsync(int id)
+    {
+        var o = await GetByIdAsync(id);
+        if (o != null)
+        {
+            _context.Orders.Remove(o);
+            await _context.SaveChangesAsync();
+        }
+        else
+            throw new KeyNotFoundException();
     }
 }
