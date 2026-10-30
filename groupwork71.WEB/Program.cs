@@ -28,12 +28,17 @@ public class Program
             options.AccessDeniedPath = "/Account/AccessDenied";
         });
 
+        
         builder.Services.AddScoped<IRestaurantService, RestaurantService>();
-        builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
         builder.Services.AddScoped<IDishService, DishService>();
-        builder.Services.AddScoped<IDishRepository, DishRepository>();
         builder.Services.AddScoped<ICartService, CartService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
+        
+        builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
+        builder.Services.AddScoped<IDishRepository, DishRepository>();
         builder.Services.AddScoped<ICartRepository, CartRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

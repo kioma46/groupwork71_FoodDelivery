@@ -219,12 +219,15 @@ namespace groupwork71.DAL.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeliveryAddress")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("RecipientName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("RestaurantId")
@@ -478,7 +481,7 @@ namespace groupwork71.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("groupwork71.DAL.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -486,6 +489,11 @@ namespace groupwork71.DAL.Migrations
                     b.Navigation("Dish");
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("groupwork71.DAL.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("groupwork71.DAL.Models.Restaurant", b =>

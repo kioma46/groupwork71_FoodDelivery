@@ -36,6 +36,43 @@
                 <span>Итого:</span>
                 <span>@Model.TotalPrice.ToString("0.00")</span>
             </div>
+            <div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Оформить заказ
+                </button>
+            </div>
         }
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Введите свои данные для заказа</h1>
+            </div>
+            <div class="modal-body">
+                <form id="order-info-form" asp-controller="Order" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="RestaurantId" value="@Model.RestaurantId" />
+                    
+                    <div class="mb-3">
+                        <input class="form-control" name="RecipientName" id="form-recipient-name-input" type="text" placeholder="Ваше имя" required />
+                    </div>
+                    <div class="mb-3">
+                        <input class="form-control" name="PhoneNumber" id="form-phone-number-input" type="text" placeholder="Номер телефона" required />
+                    </div>
+                    <div class="mb-3">
+                        <input class="form-control" name="DeliveryAddress" id="form-delivery-address-input" type="text" placeholder="Адрес доставки" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="submit" form="order-info-form" class="btn btn-primary">Заказать</button>
+            </div>
+        </div>
     </div>
 </div>

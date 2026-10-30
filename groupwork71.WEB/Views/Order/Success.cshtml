@@ -1,0 +1,52 @@
+﻿@model groupwork71.DAL.Models.Order
+
+<div class="container mt-4">
+    <div class="card shadow mx-auto" style="max-width: 650px;">
+        <div class="card-body">
+            <h4 class="text-center mb-4">Ваш заказ успешно оформлен!</h4>
+            
+            <h5 class="card-title">Получатель: @Model.RecipientName</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Телефон: @Model.PhoneNumber</h6>
+            <p class="card-text mb-1"><strong>Адрес:</strong> @Model.DeliveryAddress</p>
+            <p class="card-text mb-3"><strong>Оформлено:</strong> @Model.CreatedAt!.Value.ToString("dd.MM.yyyy HH:mm")</p>
+            
+            <hr />
+            
+            <p class="fw-bold">Состав заказа:</p>
+            @if (Model.OrderItems != null && Model.OrderItems.Any())
+            {
+                <div class="row">
+                    @foreach (var i in Model.OrderItems)
+                    {
+                        <div class="col-12 mb-2">
+                            <div class="card bg-light border-0">
+                                <div class="card-body py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">@i.Dish?.Name</h6>
+                                        <span class="fw-bold">@((i.Price * i.Quantity).ToString("0.00")) сом</span>
+                                    </div>
+                                    <small class="text-muted">@i.Quantity шт. по @i.Price.ToString("0.00")</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Товары отсутствуют</p>
+            }
+            
+            <hr />
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Итоговая цена:</h5>
+                <h5 class="text-primary mb-0">@Model.TotalPrice.ToString("0.00")</h5>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a class="btn btn-primary" asp-controller="Restaurant" asp-action="RestaurantList">К списку ресторанов</a>
+            </div>
+        </div>
+    </div>
+</div>

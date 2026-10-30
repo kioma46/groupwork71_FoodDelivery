@@ -50,4 +50,10 @@ public class CartController : Controller
         await _cartService.RemoveDishAsync(CurrentUserId, dishId);
         return await Sidebar(restaurantId);
     }
+
+    public async Task<IActionResult> Clear(int restaurantId)
+    {
+        await _cartService.ClearCartAsync(CurrentUserId, restaurantId);
+        return await Sidebar(restaurantId);
+    }
 }
